@@ -33,6 +33,14 @@
             color: #7f8c8d;
             margin-bottom: 25px;
         }
+        input[type="file"] {
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 10px;
+            border: 1px dashed #bdc3c7;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
         button {
             background-color: #27ae60;
             color: white;
@@ -62,31 +70,66 @@
 <body>
     <div class="container">
         <h1>MsVoice AI 🎙️</h1>
-        <p>I aw (voice) tifai turin kan inpeih e!</p>
+        <p>I aw (voice) tifai turin audio file thlang rawh le!</p>
         
-        <!-- Hei hi i Render Server nena inbiak pawhna tur Button a ni -->
-        <button onclick="testBackend()">Server Tlawh Chhinna</button>
+        <!-- Audio file thlanna -->
+        <input type="file" id="audioFile" accept="audio/*">
         
+        <!-- Aw thawnna Button -->
+        <button onclick="uploadAudio()">Aw Tifai Rawh</button>
+        
+        <!-- A chhanna lo lan na tur -->
         <div id="result"></div>
     </div>
 
     <script>
-        async function testBackend() {
+        async function uploadAudio() {
+            const fileInput = document.getElementById('audioFile');
             const resultDiv = document.getElementById('result');
+            
+            if (fileInput.files.length === 0) {
+                alert("Khawngaihin aw (audio) file thlang hmasa rawh le!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // A nghah chhungin loading a lo lang ang
             resultDiv.style.display = 'block';
-            resultDiv.innerText = 'Khawlpui (Server) a be mek...';
+            resultDiv.innerHTML = 'AI in a khawih mek... a rei deuh mai thei aw ⏳';
             resultDiv.style.color = '#f39c12';
+            resultDiv.style.backgroundColor = '#fef5e7';
             
             try {
-                // Heta link hi nichina i save tak ngei kha a ni!
-                const response = await fetch('https://msvoice-backend.onrender.com/');
+                // I Render Server (Backend) kha kan be dawn a ni
+                const response = await fetch('https://msvoice-backend.onrender.com/process-audio/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
                 const data = await response.json();
                 
-                resultDiv.innerText = "Chhanna: " + data.message;
-                resultDiv.style.color = "#27ae60";
-                resultDiv.style.backgroundColor = "#e8f8f5";
+                if (data.clean_audio_url) {
+                    // Hlawhtling takin a rawn let chuan Play theihna a lo lang ang
+                    resultDiv.innerHTML = `
+                        Hlawhtling takin AI-in a tifai e! 🎉<br><br>
+                        <audio controls style="width: 100%; margin-top: 10px;">
+                            <source src="${data.clean_audio_url}" type="audio/wav">
+                            I browser in audio a play thei lo.
+                        </audio>
+                    `;
+                    resultDiv.style.color = "#27ae60";
+                    resultDiv.style.backgroundColor = "#e8f8f5";
+                } else {
+                    // Dik lo a awm palhin
+                    resultDiv.innerText = "Dik lo a awm: " + (data.error || "Hriat chian loh a ni");
+                    resultDiv.style.color = "#e74c3c";
+                    resultDiv.style.backgroundColor = "#fadbd8";
+                }
             } catch (error) {
-                resultDiv.innerText = "Server a la inpeih lo emaw harsatna a awm: " + error.message;
+                resultDiv.innerText = "Server nena inbiak pawh theih a ni lo: " + error.message;
                 resultDiv.style.color = "#e74c3c";
                 resultDiv.style.backgroundColor = "#fadbd8";
             }
