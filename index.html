@@ -9,31 +9,18 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    
     <style>
         /* Advanced Glassmorphism & Ambient UI */
-        body {
-            background-color: #050505; color: #ffffff;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh;
-        }
-        .app-container {
-            width: 100%; max-width: 480px; min-height: 100vh; position: relative;
-            background: #0d0f12; overflow-x: hidden;
-            box-shadow: 0 0 40px rgba(0, 242, 254, 0.05); transition: background 0.5s ease;
-        }
-        /* Ambient Backgrounds */
+        body { background-color: #050505; color: #ffffff; font-family: 'Inter', 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; min-height: 100vh; position: relative; background: #0d0f12; overflow-x: hidden; box-shadow: 0 0 40px rgba(0, 242, 254, 0.05); transition: background 0.5s ease; }
         .bg-login { background: radial-gradient(circle at center, #1a1d24 0%, #050505 100%); }
         .bg-home { background: radial-gradient(circle at top, #001f3f 0%, #050505 80%); }
         .bg-record { background: radial-gradient(circle at top left, #2a0845 0%, #050505 100%); }
         .bg-clean { background: radial-gradient(circle at bottom right, #00332a 0%, #050505 100%); }
         
-        /* Header - Fixed Overlap */
-        .header {
-            display: flex; justify-content: space-between; align-items: center; padding: 12px 10px;
-            background: rgba(13, 15, 18, 0.85); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 242, 254, 0.2); position: sticky; top: 0; z-index: 10;
-            flex-wrap: wrap; gap: 8px;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; background: rgba(13, 15, 18, 0.85); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0, 242, 254, 0.2); position: sticky; top: 0; z-index: 10; flex-wrap: wrap; gap: 8px; }
         .logo { font-size: 16px; font-weight: 900; color: #00f2fe; text-shadow: 0 0 10px rgba(0,242,254,0.3); white-space: nowrap; margin-right: 5px; }
         .head-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
         
@@ -43,36 +30,22 @@
         .icon-btn.pro { background: linear-gradient(90deg, #ff9a9e, #fecfef); color: #000; border: none; }
         select { background: #1a1d24; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.4); padding: 4px 4px; border-radius: 6px; outline: none; font-weight: bold; font-size: 11px; }
         
-        /* Views */
         .view { display: none; padding: 20px; animation: fadeIn 0.3s ease-out; }
         .view.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Buttons */
-        .btn-neon {
-            background: linear-gradient(90deg, #4facfe, #00f2fe); color: #000; border: none;
-            padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; transition: 0.2s; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,242,254,0.2);
-        }
+        .btn-neon { background: linear-gradient(90deg, #4facfe, #00f2fe); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; transition: 0.2s; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,242,254,0.2); }
         .btn-neon:active { transform: scale(0.95); box-shadow: 0 0 30px #00f2fe; }
         
-        .btn-dark {
-            background: rgba(26, 30, 38, 0.8); backdrop-filter: blur(5px); color: #fff; border: 1px solid #2a2f38;
-            padding: 15px; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.2s; margin-bottom: 15px; font-weight: bold;
-        }
+        .btn-dark { background: rgba(26, 30, 38, 0.8); backdrop-filter: blur(5px); color: #fff; border: 1px solid #2a2f38; padding: 15px; border-radius: 12px; width: 100%; cursor: pointer; transition: 0.2s; margin-bottom: 15px; font-weight: bold; }
         .btn-dark:active { transform: scale(0.95); border-color: #00f2fe; }
         .btn-google { background: #fff; color: #000; display: flex; align-items: center; justify-content: center; gap: 10px; }
         
-        /* Timer & Floating Widget */
         .timer { font-size: 55px; text-align: center; color: #00f2fe; margin: 30px 0; font-family: monospace; text-shadow: 0 0 20px rgba(0, 242, 254, 0.5);}
         .recording-dot { width: 20px; height: 20px; background: #ff4757; border-radius: 50%; display: inline-block; margin-right: 15px; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); } 100% { box-shadow: 0 0 0 15px rgba(255, 71, 87, 0); } }
-        #floating-widget {
-            display: none; position: fixed; bottom: 30px; right: 20px; background: rgba(13, 15, 18, 0.95);
-            border: 1px solid #00f2fe; padding: 10px 15px; border-radius: 30px; box-shadow: 0 0 20px rgba(0,242,254,0.3);
-            z-index: 1000; align-items: center; gap: 10px; cursor: pointer; backdrop-filter: blur(10px);
-        }
+        #floating-widget { display: none; position: fixed; bottom: 30px; right: 20px; background: rgba(13, 15, 18, 0.95); border: 1px solid #00f2fe; padding: 10px 15px; border-radius: 30px; box-shadow: 0 0 20px rgba(0,242,254,0.3); z-index: 1000; align-items: center; gap: 10px; cursor: pointer; backdrop-filter: blur(10px); }
         
-        /* Stepper & Cards */
         .stepper { display: flex; justify-content: center; gap: 15px; margin-bottom: 20px; }
         .step { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #333; display: flex; justify-content: center; align-items: center; color: #666; font-weight: bold; }
         .step.active { border-color: #00f2fe; color: #00f2fe; box-shadow: 0 0 15px rgba(0, 242, 254, 0.5); }
@@ -83,16 +56,13 @@
         .template-card { background: rgba(20, 23, 28, 0.6); backdrop-filter: blur(8px); border: 1px solid #1f232b; padding: 15px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; display: flex; gap: 15px; align-items: center; transition: 0.2s; }
         .template-card.selected { border-color: #00f2fe; background: rgba(0, 242, 254, 0.08); }
         
-        /* Pill Buttons */
         .pill-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
         .pill-btn { background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(0, 242, 254, 0.5); padding: 10px 18px; border-radius: 30px; font-size: 14px; cursor: pointer; transition: all 0.2s ease; user-select: none; }
         .pill-btn.active { background: linear-gradient(90deg, #4facfe, #00f2fe); color: #000; font-weight: bold; border-color: transparent; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
         
-        /* Pro Features List */
         .pro-features { list-style: none; padding: 0; margin: 15px 0 0 0; }
         .pro-features li { margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: bold; }
         
-        /* Chat UI */
         .chat-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; height: 250px; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 15px; }
         .chat-history { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .msg { max-width: 80%; padding: 10px; border-radius: 10px; font-size: 13px; line-height: 1.4; }
@@ -102,7 +72,6 @@
         .chat-input-area input { flex: 1; background: transparent; border: none; padding: 12px; color: #fff; outline: none; }
         .chat-input-area button { background: #00f2fe; color: #000; border: none; padding: 0 15px; font-weight: bold; cursor: pointer; }
         
-        /* Modal for Credits */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-box { background: #1a1e26; border: 1px solid #00f2fe; padding: 25px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 0 30px rgba(0,242,254,0.2); }
         .btn-split { display: flex; gap: 10px; margin-top: 20px; }
@@ -129,8 +98,8 @@
                 <button type="button" class="icon-btn" onclick="switchView('view-help')">🤖 <span id="t-btn-guide">Guide</span></button>
                 <button type="button" class="icon-btn pro" onclick="switchView('view-pro')">💎 PRO</button>
                 <select id="langSelect" onchange="changeLanguage()">
+                    <option value="mz" selected>Mizo</option>
                     <option value="en">English</option>
-                    <option value="mz">Mizo</option>
                     <option value="hi">Hindi</option>
                     <option value="es">Spanish</option>
                     <option value="fr">French</option>
@@ -179,7 +148,6 @@
             <button type="button" class="btn-neon" onclick="switchView('view-record')">🎙️ <span id="t-btn-record">Start Recording</span></button>
             <button type="button" class="btn-dark" onclick="switchView('view-clean')">✨ <span id="t-btn-clean">AI Audio Cleaner</span></button>
             
-            <!-- PRIVACY GUARANTEE CARD -->
             <div class="template-card" style="display:block; border-color: #32CD32; background: rgba(50, 205, 50, 0.05); margin-top: 25px;">
                 <div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
                     <span style="font-size:22px;">🔒</span>
@@ -234,7 +202,6 @@
                 <div class="step" id="dot-3">3</div>
             </div>
             
-            <!-- Step 1: UPLOAD (Video Accepted Now) -->
             <div id="c-step-1" class="clean-step active">
                 <h2 id="t-h1">Upload File</h2>
                 <input type="file" id="real-file" style="display:none;" onchange="handleFile(event)" accept="audio/*, video/*">
@@ -245,7 +212,6 @@
                 <button type="button" class="btn-neon" style="display:none;" id="btn-next1" onclick="nextCleanStep(2)"><span id="t-next1">Next Step</span> ➔</button>
             </div>
             
-            <!-- Step 2: TEMPLATES -->
             <div id="c-step-2" class="clean-step">
                 <h2 id="t-h2">Select Template</h2>
                 <div class="template-card selected" onclick="selTemp(this)">
@@ -267,7 +233,6 @@
                 <button type="button" class="btn-dark" style="margin-bottom:0;" onclick="nextCleanStep(3)" id="t-next2">⚙️ Enter Custom Filters ➔</button>
             </div>
             
-            <!-- Step 3: CUSTOM FILTERS RESTORED -->
             <div id="c-step-3" class="clean-step">
                 <h2 id="t-h3">Select Enhancement Type</h2>
                 <div class="pill-container">
@@ -291,14 +256,12 @@
                 <button type="button" class="btn-neon" style="margin-top:20px;" onclick="startAIProcess()" id="t-start-custom">Process Audio ✨</button>
             </div>
             
-            <!-- Step 4: PROCESSING -->
             <div id="c-step-4" class="clean-step" style="text-align: center; padding-top: 30px;">
                 <h2 style="color: #00f2fe;" id="t-ai-title">AI is working...</h2>
                 <div class="ai-radar"><div class="ai-pulse"></div></div>
                 <div id="ai-log" style="color:#fff; font-family:monospace; margin-top:20px;">Uploading & AI Processing... ⏳</div>
             </div>
             
-            <!-- Step 5: SUCCESS -->
             <div id="c-step-5" class="clean-step" style="text-align: center; padding-top: 10px;">
                 <div style="font-size: 60px; margin-bottom: 10px;">✅</div>
                 <h2 style="color: #00f2fe; margin-bottom: 5px;" id="t-res-title">Success! Audio Cleaned.</h2>
@@ -399,7 +362,7 @@
     
     <script>
         // ==========================================
-        // FIREBASE INITIALIZATION
+        // FIREBASE INITIALIZATION & STORAGE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyD8CtDfQQ0Bs2L3UrWt-9kYfLSBCoLUnUk",
@@ -412,8 +375,9 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
-        // --- TRANSLATIONS (ALL 5 LANGUAGES) ---
+        // --- TRANSLATIONS (ALL 5 LANGUAGES KIM THLAPIN) ---
         const dict = {
             mz: {
                 "t-login-title": "MsVoice Cleaner AI", "t-login-desc": "Khawvela Audio Tihfiahna Tha Ber",
@@ -489,6 +453,117 @@
                 "t-custom-cred": "CUSTOM CREDITS", "t-custom-rate": "1 Credit = 1 Minute (₹10 / $0.15)", "t-buy-custom": "Buy Exact Amount",
                 "t-modal-title": "Not Enough Credits!", "t-modal-desc": "You need more credits to process this file. Your uploaded file is ", "t-modal-ad": "Watch Ad", "t-modal-buy": "Buy Credits", "t-modal-cancel": "Cancel",
                 "al-chat-reply": "This is an AI auto-reply. We will get back to you shortly!"
+            },
+            hi: {
+                "t-login-title": "MsVoice Cleaner AI", "t-login-desc": "दुनिया का सर्वश्रेष्ठ ऑडियो इंजन",
+                "t-login-welcome": "12 घंटे का निःशुल्क परीक्षण 🎁", "t-login-wel-desc": "अभी साइन इन करें और अगले 12 घंटों के लिए असीमित AI का आनंद लें!",
+                "t-btn-google": "Google के साथ साइन इन करें",
+                "t-welcome": "स्टूडियो में आपका स्वागत है", "t-btn-record": "रिकॉर्डिंग शुरू करें", "t-btn-clean": "AI ऑडियो क्लीनर",
+                "t-history": "हाल का इतिहास", "t-no-hist": "कोई इतिहास नहीं मिला...",
+                "t-back1": "पीछे", "t-back2": "पीछे", "t-back3": "पीछे", "t-back4": "पीछे",
+                "t-rec-title": "रिकॉर्डिंग स्टूडियो", "t-best-engine": "✨ दुनिया का सर्वश्रेष्ठ - प्राकृतिक आवाज",
+                "t-effect": "आवाज प्रभाव चुनें:", "t-start": "अभी रिकॉर्ड करें", "t-stop": "रिकॉर्डिंग रोकें",
+                "e1": "स्टूडियो रॉ ऑडियो (स्पष्ट)", "e2": "पॉडकास्ट प्रो (बास)", "e3": "रेडियो होस्ट", "e4": "ASMR / सिनेमैटिक", "e5": "कॉन्सर्ट हॉल (गूंज)", "e6": "टेलीफ़ोन", "e7": "गहरी आवाज", "e8": "क्रिस्प ट्रेबल",
+                "t-play": "पूर्वावलोकन", "t-down": "डाउनलोड करें", "t-del": "हटाएं",
+                "t-h1": "फ़ाइल अपलोड करें", "t-drop": "फ़ाइल चुनने के लिए टैप करें", "t-next1": "अगला कदम",
+                "t-h2": "टेम्पलेट चुनें",
+                "t-temp1": "✨ हल्का संपादन", "t-desc1": "पृष्ठभूमि शोर और गूंज हटाएं।",
+                "t-temp2": "🎙️ वीडियो से पॉडकास्ट", "t-desc2": "वीडियो से ऑडियो निकालें और साफ़ करें।",
+                "t-temp3": "💎 प्राकृतिक संरक्षण", "t-desc3": "अपनी मूल प्राकृतिक आवाज बनाए रखें।",
+                "t-start-auto": "✨ AI प्रोसेसिंग शुरू करें", "t-rate-info": "दर: 1 क्रेडिट = 1 मिनट",
+                "t-next2": "⚙️ कस्टम फ़िल्टर दर्ज करें ➔",
+                "t-h3": "संवर्धन प्रकार चुनें", "t-start-custom": "ऑडियो प्रोसेस करें ✨",
+                "f_noise": "शोर हटाएं", "f_echo": "गूंज हटाएं", "f_mute": "खंड म्यूट करें", "f_silence": "लंबी खामोशी हटाएं",
+                "f_wind": "हवा का शोर हटाएं", "f_mouth": "मुंह की आवाज हटाएं", "f_hesitation": "हिचकिचाहट दूर करें", "f_stutter": "हकलाना हटाएं",
+                "f_filler": "फ़िलर शब्द हटाएं", "f_music": "संगीत रखें", "f_autoeq": "AutoEQ", "f_breath": "सांस की आवाज हटाएं",
+                "f_norm": "सामान्यीकरण", "f_studio": "स्टूडियो ध्वनि", "f_bg": "पृष्ठभूमि ऑडियो हटाएं", "f_reverb": "रिवर्ब हटाएं",
+                "t-ai-title": "AI काम कर रहा है...", "t-res-title": "सफलता! ऑडियो साफ़ किया गया।", "t-res-play": "पूर्वावलोकन", "t-res-down": "फ़ोन में डाउनलोड करें",
+                "t-help-title": "🤖 लाइव AI सहायक", "t-chat-welcome": "नमस्ते! मैं आपका AI सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?", "t-chat-send": "भेजें", "t-btn-guide": "गाइड",
+                "t-contact-title": "डेवलपर से संपर्क करें", "t-contact-bot": "MsVoice टेलीग्राम बॉट", "t-contact-desc": "सहायता के लिए संपर्क करें।",
+                "t-pro-title": "💎 प्रो में अपग्रेड करें", "t-watch-ad": "5 क्रेडिट के लिए विज्ञापन देखें",
+                "t-time-hr": "1 घंटा (60 मिनट)", "t-time-day": "1 दिन (300 मिनट)", "t-time-wk": "प्रो 1 सप्ताह", "t-time-mo": "प्रो 1 महीना", "t-time-yr": "प्रो 1 वर्ष",
+                "t-buy-hr": "प्रति घंटा खरीदें", "t-buy-day": "प्रति दिन खरीदें", "t-buy-wk": "साप्ताहिक खरीदें", "t-buy-mo": "मासिक खरीदें", "t-buy-yr": "वार्षिक खरीदें", "t-pop": "सबसे लोकप्रिय", "t-best": "सर्वोत्तम मूल्य",
+                "t-pro-feat-title": "प्रो के क्या फायदे हैं?",
+                "t-pro-f1": "प्राथमिकता फास्ट प्रोसेसिंग (VIP सर्वर)", "t-pro-f2": "एक साथ कई फ़ाइलें", "t-pro-f3": "स्टूडियो गुणवत्ता (48kHz)", "t-pro-f4": "कोई विज्ञापन नहीं",
+                "t-privacy-title": "100% गोपनीयता की गारंटी",
+                "t-privacy-desc": "आपकी फ़ाइलें एंड-टू-एंड एन्क्रिप्टेड हैं। हम (ऐप के मालिक) भी आपका ऑडियो सुन या देख नहीं सकते हैं।",
+                "t-custom-cred": "कस्टम क्रेडिट", "t-custom-rate": "1 क्रेडिट = 1 मिनट (₹10 / $0.15)", "t-buy-custom": "सटीक मात्रा खरीदें",
+                "t-modal-title": "क्रेडिट पर्याप्त नहीं है!", "t-modal-desc": "आपको और क्रेडिट चाहिए। आपकी फ़ाइल है ", "t-modal-ad": "विज्ञापन देखें", "t-modal-buy": "क्रेडिट खरीदें", "t-modal-cancel": "रद्द करें",
+                "al-chat-reply": "यह एक AI ऑटो-रिप्लाई है। हम जल्द ही आपसे संपर्क करेंगे!"
+            },
+            es: {
+                "t-login-title": "MsVoice Cleaner AI", "t-login-desc": "El mejor motor de audio del mundo",
+                "t-login-welcome": "Prueba Gratuita de 12 Horas 🎁", "t-login-wel-desc": "¡Inicie sesión ahora y disfrute del procesamiento IA ilimitado!",
+                "t-btn-google": "Iniciar sesión con Google",
+                "t-welcome": "Bienvenido al Estudio", "t-btn-record": "Empezar a Grabar", "t-btn-clean": "Limpiador de Audio IA",
+                "t-history": "Historial Reciente", "t-no-hist": "No se encontró historial...",
+                "t-back1": "Atrás", "t-back2": "Atrás", "t-back3": "Atrás", "t-back4": "Atrás",
+                "t-rec-title": "Estudio de Grabación", "t-best-engine": "✨ El mejor del mundo - Voz natural",
+                "t-effect": "Seleccionar Efecto:", "t-start": "Grabar Ahora", "t-stop": "Detener",
+                "e1": "Audio Crudo (Mejor claridad)", "e2": "Podcast Pro", "e3": "Locutor de Radio", "e4": "ASMR / Cine", "e5": "Sala de Conciertos", "e6": "Teléfono", "e7": "Voz Profunda", "e8": "Agudos Claros",
+                "t-play": "Reproducir", "t-down": "Descargar", "t-del": "Eliminar",
+                "t-h1": "Subir Archivo", "t-drop": "Toque para seleccionar", "t-next1": "Siguiente",
+                "t-h2": "Seleccionar Plantilla",
+                "t-temp1": "✨ Mejora Ligera", "t-desc1": "Eliminar ruido de fondo y eco.",
+                "t-temp2": "🎙️ Podcast desde Video", "t-desc2": "Extraer y limpiar audio de video.",
+                "t-temp3": "💎 Conservación Natural", "t-desc3": "Mantenga su tono de voz natural exacto.",
+                "t-start-auto": "✨ Iniciar IA", "t-rate-info": "Tarifa: 1 Crédito = 1 Minuto",
+                "t-next2": "⚙️ Filtres Personalizados ➔",
+                "t-h3": "Seleccionar Mejoras", "t-start-custom": "Procesar Audio ✨",
+                "f_noise": "Eliminar Ruido", "f_echo": "Eliminar Eco", "f_mute": "Silenciar Segmentos", "f_silence": "Eliminar Silencios",
+                "f_wind": "Ruido de Viento", "f_mouth": "Sonidos de Boca", "f_hesitation": "Dudas", "f_stutter": "Tartamudeo",
+                "f_filler": "Muletillas", "f_music": "Mantener Música", "f_autoeq": "AutoEQ", "f_breath": "Respiración",
+                "f_norm": "Normalizar", "f_studio": "Sonido de Estudio", "f_bg": "Fondo de Audio", "f_reverb": "Eliminar Reverb",
+                "t-ai-title": "La IA está trabajando...", "t-res-title": "¡Éxito! Audio Limpio.", "t-res-play": "Reproducir", "t-res-down": "Descargar al Teléfono",
+                "t-help-title": "🤖 Asistente IA en vivo", "t-chat-welcome": "¡Hola! Soy tu asistente de IA. ¿Cómo puedo ayudarte?", "t-chat-send": "Enviar", "t-btn-guide": "Guía",
+                "t-contact-title": "Contactar al Desarrollador", "t-contact-bot": "MsVoice Telegram Bot", "t-contact-desc": "Comuníquese para obtener soporte.",
+                "t-pro-title": "💎 Actualizar a PRO", "t-watch-ad": "Ver anuncio para ganar 5 créditos",
+                "t-time-hr": "1 Hora (60 Mins)", "t-time-day": "1 Día (300 Mins)", "t-time-wk": "PRO 1 Semana", "t-time-mo": "PRO 1 Mes", "t-time-yr": "PRO 1 Año",
+                "t-buy-hr": "Comprar por Hora", "t-buy-day": "Comprar por Día", "t-buy-wk": "Comprar Semanal", "t-buy-mo": "Comprar Mensual", "t-buy-yr": "Comprar Anual", "t-pop": "MÁS POPULAR", "t-best": "MEJOR VALOR",
+                "t-pro-feat-title": "¿Por qué ser PRO?",
+                "t-pro-f1": "Servidor VIP Rápido", "t-pro-f2": "Múltiples Archivos a la vez", "t-pro-f3": "Calidad de Estudio (48kHz)", "t-pro-f4": "Cero Anuncios",
+                "t-privacy-title": "100% Privacidad Garantizada",
+                "t-privacy-desc": "Tus archivos están encriptados de extremo a extremo. Ni siquiera los dueños de la aplicación pueden escuchar tu audio.",
+                "t-custom-cred": "CRÉDITS PERSONALIZADOS", "t-custom-rate": "1 Crédito = 1 Minuto (₹10 / $0.15)", "t-buy-custom": "Comprar Cantidad Exacta",
+                "t-modal-title": "¡No Hay Suficientes Créditos!", "t-modal-desc": "Necesitas más créditos. Tu archivo es ", "t-modal-ad": "Ver Anuncio", "t-modal-buy": "Comprar", "t-modal-cancel": "Cancelar",
+                "al-chat-reply": "Esta es una respuesta automática. ¡Nos pondremos en contacto pronto!"
+            },
+            fr: {
+                "t-login-title": "MsVoice Cleaner AI", "t-login-desc": "Le meilleur moteur audio au monde",
+                "t-login-welcome": "Essai Gratuit de 12 Heures 🎁", "t-login-wel-desc": "Connectez-vous pour profiter d'un traitement IA illimité !",
+                "t-btn-google": "Se connecter avec Google",
+                "t-welcome": "Bienvenue au Studio", "t-btn-record": "Commencer", "t-btn-clean": "Nettoyeur Audio IA",
+                "t-history": "Historique récent", "t-no-hist": "Aucun historique trouvé...",
+                "t-back1": "Retour", "t-back2": "Retour", "t-back3": "Retour", "t-back4": "Retour",
+                "t-rec-title": "Studio d'enregistrement", "t-best-engine": "✨ Le meilleur du monde - Voix naturelle",
+                "t-effect": "Choisir l'effet:", "t-start": "Enregistrer", "t-stop": "Arrêter",
+                "e1": "Studio Raw Audio", "e2": "Podcast Pro", "e3": "Animateur Radio", "e4": "ASMR / Cinéma", "e5": "Salle de Concert", "e6": "Téléphone", "e7": "Voix Profonde", "e8": "Aigus Clairs",
+                "t-play": "Écouter", "t-down": "Télécharger", "t-del": "Supprimer",
+                "t-h1": "Uploader un fichier", "t-drop": "Appuyez pour sélectionner", "t-next1": "Étape suivante",
+                "t-h2": "Sélectionner un modèle",
+                "t-temp1": "✨ Amélioration légère", "t-desc1": "Supprimer le bruit de fond et l'écho.",
+                "t-temp2": "🎙️ Podcast à partir d'une vidéo", "t-desc2": "Extraire et nettoyer l'audio de la vidéo.",
+                "t-temp3": "💎 Préservation naturelle", "t-desc3": "Gardez votre tonalité de voix naturelle exacte.",
+                "t-start-auto": "✨ Lancer l'IA", "t-rate-info": "Tarif : 1 Crédit = 1 Minute",
+                "t-next2": "⚙️ Filtres personnalisés ➔",
+                "t-h3": "Sélectionner les améliorations", "t-start-custom": "Traiter l'audio ✨",
+                "f_noise": "Supprimer le bruit", "f_echo": "Supprimer l'écho", "f_mute": "Couper les segments", "f_silence": "Silences longs",
+                "f_wind": "Bruit du vent", "f_mouth": "Bruits de bouche", "f_hesitation": "Hésitations", "f_stutter": "Bégaiement",
+                "f_filler": "Mots de remplissage", "f_music": "Garder la musique", "f_autoeq": "AutoEQ", "f_breath": "Respiration",
+                "f_norm": "Normaliser", "f_studio": "Son Studio", "f_bg": "Audio d'arrière-plan", "f_reverb": "Réverbération",
+                "t-ai-title": "L'IA travaille...", "t-res-title": "Succès ! Audio nettoyé.", "t-res-play": "Écouter", "t-res-down": "Télécharger sur le téléphone",
+                "t-help-title": "🤖 Assistant IA en direct", "t-chat-welcome": "Bonjour ! Je suis votre assistant IA. Comment puis-je vous aider ?", "t-chat-send": "Envoyer", "t-btn-guide": "Guide",
+                "t-contact-title": "Contacter le développeur", "t-contact-bot": "MsVoice Telegram Bot", "t-contact-desc": "Contactez-nous pour obtenir de l'aide.",
+                "t-pro-title": "💎 Passer à PRO", "t-watch-ad": "Voir la pub pour 5 crédits",
+                "t-time-hr": "1 Heure (60 Mins)", "t-time-day": "1 Jour (300 Mins)", "t-time-wk": "PRO 1 Semaine", "t-time-mo": "PRO 1 Mois", "t-time-yr": "PRO 1 An",
+                "t-buy-hr": "Acheter par Heure", "t-buy-day": "Acheter par Jour", "t-buy-wk": "Acheter Hebdomadaire", "t-buy-mo": "Acheter Mensuel", "t-buy-yr": "Acheter Annuel", "t-pop": "LE PLUS POPULAIRE", "t-best": "MEILLEUR PRIX",
+                "t-pro-feat-title": "Pourquoi choisir PRO ?",
+                "t-pro-f1": "Serveur VIP Rapide", "t-pro-f2": "Traitement par Lots (Plusieurs fichiers)", "t-pro-f3": "Qualité Studio (48kHz)", "t-pro-f4": "Zéro Publicité",
+                "t-privacy-title": "Confidentialité garantie à 100%",
+                "t-privacy-desc": "Vos fichiers sont cryptés de bout en bout. Même les propriétaires de l'application ne peuvent pas écouter votre audio.",
+                "t-custom-cred": "CRÉDITS PERSONNALISÉS", "t-custom-rate": "1 Crédit = 1 Minute (₹10 / $0.15)", "t-buy-custom": "Acheter le Montant Exact",
+                "t-modal-title": "Pas Assez de Crédits !", "t-modal-desc": "Vous avez besoin de plus de crédits. Votre fichier est ", "t-modal-ad": "Regarder une Pub", "t-modal-buy": "Acheter", "t-modal-cancel": "Annuler",
+                "al-chat-reply": "Ceci est une réponse automatique de l'IA. Nous vous contacterons bientôt !"
             }
         };
 
@@ -504,10 +579,16 @@
             for (const id in dict[targetLang]) { 
                 let el = document.getElementById(id);
                 if (el) {
-                    if (el.tagName === 'INPUT' && el.type === 'text') { }
-                    else { el.innerHTML = dict[targetLang][id]; }
+                    if (el.tagName === 'INPUT' && el.type === 'text') {
+                        // handled manually
+                    } else {
+                        el.innerHTML = dict[targetLang][id]; 
+                    }
                 }
             }
+            if(lang === 'mz') document.getElementById('custom-cred-input').placeholder = "Credit engzatnge i duh?";
+            else if(lang === 'en') document.getElementById('custom-cred-input').placeholder = "How many credits?";
+            else document.getElementById('custom-cred-input').placeholder = "Credits?";
         }
 
         // ----------------------------------------
@@ -615,7 +696,6 @@
         // --- AUDIO ENGINE ---
         let mediaRecorder, audioChunks = [], audioBlob = null, audioPlayer = new Audio();
         let micStream = null, audioContext = null, timerInt, secs = 0, finalExt = "mp3";
-        // Ai thluak aṭanga result rawn let dahna tur
         window.cleanAudioResultUrl = null; 
 
         async function startRealRecording() {
@@ -690,14 +770,12 @@
         }
 
         function playPreview() {
-            // AI in a tihfai sa a awm chuan chu chu play tur a ni
             if (window.cleanAudioResultUrl) {
                 if(!audioPlayer.paused) audioPlayer.pause();
                 audioPlayer.src = window.cleanAudioResultUrl;
                 audioPlayer.play();
                 return;
             }
-            // A awm loh chuan kan record laihlaih kha
             if (!audioBlob) return;
             const reader = new FileReader(); reader.readAsDataURL(audioBlob);
             reader.onloadend = function() {
@@ -750,16 +828,14 @@
             }
         }
 
-        // HEI HI A THLUAK TAK TAK NENA KAN THLUNZAWMNA LAI CHU A NI E 👇
+        // HEI HI A THLUAK TAK TAK (FIREBASE LEH RENDER INTHLUNZAWMNA) 👇
         async function executeClean() {
-            // Processing step lan tirna
             nextCleanStep(4); 
             const logText = document.getElementById('ai-log');
-            logText.innerText = "Uploading & AI Processing... A rei deuh mai thei aw ⏳";
+            logText.innerText = "Firebase-ah kan upload mek... A lian deuh phei chuan a rei deuh mai thei aw ⏳";
             logText.style.color = "#fff";
             window.cleanAudioResultUrl = null; 
 
-            // File a thlan dik tak lak chhuah
             const fileInput = document.getElementById('real-file');
             if (!fileInput.files || fileInput.files.length === 0) {
                 alert("Khawngaihin file thlang hmasa rawh le!");
@@ -768,41 +844,68 @@
             }
 
             const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append("file", file);
 
             try {
-                // I RENDER SERVER TAK TAK NENA INBIAKNA
-                const response = await fetch('https://msvoice-backend.onrender.com/process-audio/', {
-                    method: 'POST',
-                    body: formData
-                });
+                // 1. FIREBASE-AH UPLOAD HMASA PHAWT
+                const storageRef = storage.ref();
+                const fileRef = storageRef.child('uploads/' + Date.now() + '_' + file.name);
+                const uploadTask = fileRef.put(file);
                 
-                const data = await response.json();
-                
-                if (data.clean_audio_url) {
-                    // Hlawhtling takin a thawk e
-                    window.cleanAudioResultUrl = data.clean_audio_url; 
-                    nextCleanStep(5);
-                } else {
-                    // AI lamah harsatna a awm palhin
-                    logText.innerText = "Dik lo a awm: " + (data.error || "Hriat chian loh a ni");
-                    logText.style.color = "#ff4757";
-                }
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        logText.innerText = "Firebase-ah kan upload mek... (" + Math.round(progress) + "%)";
+                        logText.style.color = "#ffcc00";
+                    }, 
+                    (error) => {
+                        logText.innerText = "Upload a buai: " + error.message; 
+                        logText.style.color = "#ff4757";
+                    }, 
+                    async () => {
+                        logText.innerText = "Upload a zo e! AI-in a tihfai mek chhung lo nghak leh lawk rawh aw... ⏳";
+                        logText.style.color = "#00f2fe";
+                        
+                        // 2. LINK LAK CHHUAH
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                        
+                        // 3. RENDER (AI SERVER) A THAWN LIAU LIAU
+                        const response = await fetch('https://msvoice-backend.onrender.com/process-url/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ url: downloadURL })
+                        });
+                        
+                        // Render Server thar khan ala hriat loh (404 Not Found) chuan warning fiah zawk kan siam ang
+                        if (!response.ok) {
+                            if (response.status === 404) {
+                                throw new Error("Render server a la in-install zo lo. Minute 2 vel hnuah han ti ṭha leh teh!");
+                            } else {
+                                throw new Error("Server error: " + response.status);
+                            }
+                        }
+
+                        const data = await response.json();
+                        
+                        if (data.clean_audio_url) {
+                            window.cleanAudioResultUrl = data.clean_audio_url; 
+                            nextCleanStep(5);
+                        } else {
+                            logText.innerText = "Dik lo a awm: " + (data.error || "Hriat chian loh a ni");
+                            logText.style.color = "#ff4757";
+                        }
+                    }
+                );
             } catch (error) {
-                // Server be pawh thei lo
-                logText.innerText = "Server a buai emaw a muthlu mek: " + error.message;
+                logText.innerText = "Harsatna a awm: " + error.message;
                 logText.style.color = "#ff4757";
             }
         }
         
         function downloadRealFile(filename) { 
-            // AI in a tihfai sa URL aṭanga download-na
             if (window.cleanAudioResultUrl) {
                 window.open(window.cleanAudioResultUrl, '_blank');
                 return;
             }
-            // A awm loh palha fallback
             const blob = new Blob(["Audio File Data"], {type: "audio/mp3"}); const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = filename;
             document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
